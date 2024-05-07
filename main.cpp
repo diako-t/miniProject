@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
-#include <iomanip>
+#include<vector>
+#include<algorithm>
 using namespace std ;
 
 class userpass
@@ -50,56 +51,145 @@ public:
 class exam
 {
 protected:
-    int d_counter = 1 , t_counter = 1 ;
-    int m = 1 , time , type ;
-    float * d_grade = new float [d_counter] ;
-    float * t_grade = new float [t_counter] ;
-    string * descriptive = new string [d_counter] ;
-    string * test = new string [t_counter] ;
-    string ** options =(string **) new string[t_counter][4] ;
-    int * correctAnswer = new int [t_counter] ;
+    int d_counter = 0 , t_counter = 0 ;
+    int time , type ;
+    string * descriptive ;
+    string *helper_descriptive;
+    float * d_grade ;
+    float *d_grade_helper;
+    string * test;
+    string * helper_test;
+    float * t_grade;
+    float * t_grade_helper;
+    string * options;
+    string * options_helper;
+    int * correctAnswer;
+    int * correctAnswer_helper;
     int list_n = -1;
+    bool d_check = false;
+    bool t_check = false;
 public:
     void questionType()
     {
         cout<<"which type of question you want to enter?\n"<<"1_descriptive  or  2_test "<<"(press 0 if you are done)\n" ;
         cin>>type ;
-        if(type == 1)
-            descriptiveQuestion() ;
+        if(type == 1) {
+            descriptiveQuestion();
+        }
         else if(type == 2)
             testQuestion() ;
         else
             details() ;
     }
-    void testQuestion()
-    {
-        cout<<"enter question number "<<m<<endl ;
-        getline(cin , test[t_counter-1]) ;
-        cout<<"enter 4 options (press enter after each option)\n" ;
-        for(int i=0 ; i<4 ; i++)
-            getline(cin , options[t_counter-1][i]) ;
-        cout<<"which answer is correct?\n" ;
-        cin>>correctAnswer[t_counter-1] ;
-        cout<<"score for this question:\n" ;
-        cin>>t_grade[t_counter-1];
-        t_counter++ ;
-        m++ ;
-        questionType() ;
+    void testQuestion() {
+        if (!t_check) {
+            t_counter++;
+            test = new string[t_counter];
+            cout << "your question?\n";
+            getline(cin >> ws, test[t_counter - 1]);
+            options = new string [t_counter*4];
+            cout << "enter 4 options (press enter after each one)\n";
+            for(int i=0 ; i<(t_counter*4) ; i++)
+                getline(cin>>ws , options[i]);
+            correctAnswer = new int[t_counter];
+            cout << "which answer is correct ?\n";
+            cin >> correctAnswer[t_counter - 1];
+            t_grade = new float[t_counter];
+            cout << "score for this question:\n";
+            cin >> t_grade[t_counter - 1];
+        }
+        else {
+            helper_test = new string[t_counter];
+            options_helper = new string[t_counter*4];
+            correctAnswer_helper = new int [t_counter];
+            t_grade_helper = new float [t_counter] ;
+            for (int i = 0; i < t_counter; ++i)
+            {
+                helper_test[i] = test[i] ;
+                correctAnswer_helper[i] = correctAnswer[i];
+                t_grade_helper[i] = t_grade[i];
+            }
+            for(int i = 0; i < (t_counter*4); ++i)
+                options_helper[i] = options[i];
+            delete[]test;
+            delete[]options;
+            delete[]correctAnswer;
+            delete[]t_grade;
+            t_counter++;
+            test = new string[t_counter];
+            options = new string[t_counter*4];
+            correctAnswer = new int[t_counter];
+            t_grade = new float[t_counter];
+            for (int i = 0; i < (t_counter-1); ++i)
+            {
+                test[i] = helper_test[i];
+                correctAnswer[i] = correctAnswer_helper[i];
+                t_grade[i] = t_grade_helper[i];
+            }
+            for (int i = 0; i < ((t_counter*4)-4); ++i)
+                options[i] = options_helper[i];
+            delete[]helper_test;
+            delete[]options_helper;
+            delete[]correctAnswer_helper;
+            delete[]t_grade_helper;
+            cout << "your question?\n";
+            getline(cin >> ws, test[t_counter - 1]);
+            cout << "enter 4 options (press enter after each one)\n";
+            for (int i = ((t_counter*4)-4); i < (t_counter*4); i++)
+                getline(cin >> ws, options[i]);
+            cout << "which answer is correct ?\n";
+            cin >> correctAnswer[t_counter - 1];
+            cout << "score for this question:\n";
+            cin >> t_grade[t_counter - 1];
+        }
+        t_check = true;
+        questionType();
     }
     void descriptiveQuestion()
     {
-        d_counter++ ;
-        m++ ;
-        cout<<"enter question number "<<m<<endl ;
-        getline(cin , descriptive[d_counter-1]) ;
-        cout<<"score for this question:\n" ;
-        cin>>d_grade[d_counter-1] ;
-        questionType() ;
+        if(!d_check)
+        {
+            d_counter++ ;
+            descriptive = new string [d_counter];
+            cout<<"your question?\n";
+            getline(cin>>ws , descriptive[d_counter-1]) ;
+            d_grade = new float [d_counter];
+            cout<<"score for this question:\n" ;
+            cin>>d_grade[d_counter-1] ;
+        }
+        else
+        {
+            d_grade_helper = new float [d_counter];
+            helper_descriptive = new string [d_counter];
+            for (int i = 0; i < d_counter; ++i)
+            {
+                helper_descriptive [i] = descriptive[i];
+                d_grade_helper[i] = d_grade[i];
+            }
+            delete [] descriptive;
+            delete [] d_grade;
+            ++d_counter;
+            d_grade = new float [d_counter];
+            descriptive = new string [d_counter];
+            for (int i = 0; i < (d_counter-1); ++i)
+            {
+                descriptive[i] = helper_descriptive[i];
+                d_grade [i] = d_grade_helper[i];
+            }
+            delete [] helper_descriptive;
+            delete [] d_grade_helper;
+            cout<<"your question?\n";
+            getline(cin>>ws , descriptive[d_counter-1]) ;
+            cout<<"score for this question:\n" ;
+            cin>>d_grade[d_counter-1] ;
+        }
+        d_check = true;
+        questionType();
     }
     void details()
     {
         int order ;
-        int sum = 0 ;
+        float sum = 0 ;
         cout<<"time to answer exam:\n" ;
         cin>>time ;
         cout<<"press 1 if you want to see the details of exam or press 2 if you want to save the exam and exit\n" ;
@@ -118,15 +208,22 @@ public:
     }
     void print_questions()
     {
+        int counter = 0 , w = 0;
+        char abcd[4] = {'A' , 'B' , 'C' , 'D'};
         cout<<"descriptive questions:\n" ;
         for(int i=0 ; i<d_counter ; i++)
             cout<<i+1<<"- "<<descriptive[i]<<"( "<<d_grade[i]<<" )"<<endl;
         cout<<"test questions:\n" ;
-        for(int i=0 ; i<t_counter ; i++)
-            {
-            cout<<(d_counter+i+1)<<"- "<<test[i]<<"( "<<t_grade[i]<<" )"<<endl;
-            cout<<"A_ "<<options[i][1]<<endl<<"B- "<<options[i][2]<<endl<<"C_ "<<options[i][3]<<endl<<"D_ "<<options[i][4]<<endl;
+        for(int j=0 ; j<t_counter ; j++) {
+            cout<<(d_counter+j+1)<<"- "<<test[j]<<"( "<<t_grade[j]<<" )"<<endl;
+            for (int i = (counter * 4); i < ((counter * 4) + 4); i++) {
+
+                cout<<abcd[w]<<"_ "<<options[i]<<endl;
+                w++;
             }
+            counter++;
+            w = 0;
+        }
         cout<<"time(minute) = "<<time<<endl<<"good luck"<<endl;
     }
     void setList_n(int y)
@@ -136,6 +233,26 @@ public:
     int retList_n()
     {
         return list_n;
+    }
+    int retD_counter()
+    {
+        return d_counter;
+    }
+    int retT_counter()
+    {
+        return t_counter;
+    }
+    float retD_grade(int x)
+    {
+        return d_grade[x];
+    }
+    float retT_grade(int x)
+    {
+        return t_grade[x];
+    }
+    int ret_correct(int x)
+    {
+        return correctAnswer[x];
     }
     ~exam()
     {
@@ -150,9 +267,10 @@ public:
 
 //-------------------------------------------------------------------------------------
 
-class correction :public exam
+class correction
 {
-    int user , pass , exam_number;
+    int user , pass , exam_number ;
+    
 public:
     void set_data(int u , int p , int e)
     {
@@ -167,62 +285,46 @@ public:
 class list
 {
 protected:
-    int size = 0 ;
-    int * s_username = new int [size] ;
-    int * s_password = new int [size] ;
+    vector<int>s_username;
+    vector<int>s_password;
+    int username , password ;
 public:
     void make_list()
     {
         int order = 1 ;
         while (order==1)
         {
-            size++ ;
-            cout << "enter student " << size << " username(student ID) and password(national ID number)\n";
-            cin >> s_username[size - 1] >> s_password[size - 1];
+            cout << "enter student " << s_username.size() +1 << " username(student ID) and password(national ID number)\n";
+            cin >>username>>password;
+            s_username.push_back(username);
+            s_password.push_back(password);
             cout << "press 1 if you want to continue or press 2 if you are done\n";
             cin >> order;
 
         }
     }
-    void add_student()
-    {
-        int order = 1;
-        while (order==1) {
-            size++ ;
-            cout << "enter student " << size << " username(student ID) and password(national ID number)\n";
-            cin >> s_username[size - 1] >> s_password[size - 1];
-            cout << "press 1 if you want to continue or press 2 if you are done\n";
-            cin >> order;
-        }
-    }
     void remove_student()
     {
-        int temp , order = 1 , user;
+        int temp ;
+        int order = 1;
         while(order==1)
         {
-            cout<<"student username:\n" ;
-            cin>>user ;
-       for(int i=0 ; i<size ; i++)
-       {
-           temp = s_username[i] ;
-           if(user == temp)
-           {
-               for (int j = i; j < size - 1; j++)
-                   s_username[j] = s_username[j + 1];
-               for (int j = i; j < size - 1; j++)
-                   s_password[j] = s_password[j + 1];
-               size-- ;
-               break ;
-           }
-       }
+            cout << "enter student username:" << endl;
+            cin >> temp;
+            auto x = find(s_username.begin() , s_username.end() , temp);
+            if(x != s_username.end())
+                s_username.erase(x);
+            else
+                cout << "not found" << endl;
        cout<<"press 1 if you want to continue or press 2 if you are done\n";
        cin>>order ;
     }
     }
     void print_lists()
     {
-        for (int i = 0; i < size; ++i)
-            cout<<s_username<<setw(3)<<s_password<<endl;
+        cout<<"username:        password:\n";
+        for (int i = 0; i < s_username.size() ; ++i)
+            cout<<s_username[i]<<"              "<<s_password[i]<<endl;
     }
     int ret_username(int x)
     {
@@ -234,12 +336,7 @@ public:
     }
     int ret_n()
     {
-        return size;
-    }
-    ~list()
-    {
-        delete[]s_username ;
-        delete[]s_password ;
+        return s_username.size() +1;
     }
 };
 
@@ -250,9 +347,15 @@ class professor : public userpass
 protected:
     int n , new_pass , exam_counter = 0 , list_counter = 0 , cor_counter = 0 , number;
     string new_user;
-    exam * ex = new exam [exam_counter];
-    list * li = new list [list_counter];
-    correction * cor = new correction [cor_counter];
+    exam * ex;
+    exam * ex_helper;
+    bool ex_check = false;
+    list * li;
+    list * li_helper;
+    bool li_check = false;
+    correction * cor;
+    correction * cor_helper;
+    bool cor_check = false;
 public:
     void order() {
         do {
@@ -270,8 +373,26 @@ public:
                     change_up(new_user, new_pass);
                     break;
                 case 2:
-                    exam_counter++;
-                    ex[exam_counter - 1].questionType();
+                    if(!ex_check)
+                    {
+                        exam_counter++;
+                        ex = new exam [exam_counter];
+                        ex[exam_counter-1].questionType();
+                    }
+                    else
+                    {
+                        ex_helper = new exam [exam_counter];
+                        for(int i=0 ; i<exam_counter ; i++)
+                            ex_helper[i] = ex[i];
+                        //delete [] ex; ????
+                        exam_counter++;
+                        ex = new exam[exam_counter];
+                        for(int j=0 ; j<(exam_counter-1) ; j++)
+                            ex[j] = ex_helper[j];
+                        //delete[]ex_helper; ????
+                        ex[exam_counter-1].questionType();
+                    }
+                    ex_check = true;
                     break;
                 case 3:
                     cout << "exam number :\n";
@@ -282,8 +403,26 @@ public:
                     cout << exam_counter << " exams\n";
                     break;
                 case 5:
-                    list_counter++;
-                    li[list_counter - 1].make_list();
+                    if(!li_check)
+                    {
+                        list_counter++;
+                        li = new list [list_counter];
+                        li[list_counter-1].make_list();
+                    }
+                    else
+                    {
+                        li_helper = new list [list_counter];
+                        for(int i=0 ; i<list_counter ; i++)
+                            li_helper[i] = li[i];
+                        delete[]li;
+                        list_counter++;
+                        li = new list[list_counter];
+                        for(int j=0 ; j<(list_counter-1) ; j++)
+                            li[j] = li_helper[j];
+                        delete[]li_helper;
+                        li[list_counter-1].make_list();
+                    }
+                    li_check = true;
                     break;
                 case 6:
                     cout << list_counter << " student lists\n";
@@ -300,15 +439,15 @@ public:
                     cout << "1_add or 2_remove student from list\n";
                     cin >> num;
                     if (num == 1)
-                        li[number - 1].add_student();
+                        li[number - 1].make_list();
                     else
                         li[number - 1].remove_student();
                     break;
                 case 9:
                     int l , e;
-                    cout<<"list number: ";
+                    cout<<"list number:\n";
                     cin>>l;
-                    cout<<"\nto exam number: ";
+                    cout<<"to exam number:\n";
                     cin>>e;
                     ex[e - 1].setList_n(l-1);
                     break;
@@ -317,8 +456,26 @@ public:
     }
     void student_answer(int a , int b , int c)
     {
-        cor_counter++;
-        cor[cor_counter-1].set_data(a , b , c);
+        if(!cor_check)
+        {
+            cor_counter++;
+            cor = new correction[cor_counter];
+            cor[cor_counter-1].set_data(a , b , c);
+        }
+        else
+        {
+            cor_helper = new correction[cor_counter];
+            for(int i=0 ; i<cor_counter ; i++)
+                cor_helper[i] = cor[i];
+            delete[]cor;
+            cor_counter++;
+            cor = new correction[cor_counter];
+            for(int j=0 ; j<(cor_counter-1); j++)
+                cor[j] = cor_helper[j];
+            delete[]cor_helper;
+            cor[cor_counter-1].set_data(a , b , c);
+        }
+        cor_check = true;
     }
 };
 //---------------------------------------------------------------------
@@ -365,8 +522,9 @@ public:
                 }
             if(!find)
                 cout<<"no exam found for you!\n";
-            else
-                student_answer(s_username , s_password , index);
+            else {
+                student_answer(s_username, s_password, index);
+            }
         }
     }
 };
@@ -377,18 +535,21 @@ int main()
 {
     student ob;
     int n ;
-    cout<<"log in as : 1_professor  or  2_student\n" ;
-    cin>>n ;
-    if(n == 1) {
-        ob.set_Puserpass();
-        if (ob.P_check())
-            ob.order();
-    }
-    else
+    cout << "log in as : 1_professor  or  2_student\n";
+    cin >> n;
+    while(n == 1 || n == 2)
     {
-        if(ob.s_check())
-            ob.s_order();
-
+        if (n == 1) {
+            ob.set_Puserpass();
+            if (ob.P_check())
+                ob.order();
+        }
+        else {
+            if (ob.s_check())
+                ob.s_order();
+        }
+        cout << "log in as : 1_professor  or  2_student\n";
+        cin >> n;
     }
     return 0 ;
 }
