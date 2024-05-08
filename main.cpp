@@ -269,14 +269,116 @@ public:
 
 class correction
 {
-    int user , pass , exam_number ;
-    
+    int user , pass , exam_number;
+    int d_counter , t_counter;
+    float total_grade = 0;
+    float * d_grade;
+    float * t_grade;
+    int * correctAnswer;
+    string * d_answer;
+    int * t_answer;
+    string * WR_answers;
+    float * student_grade;
+    string * comment;
 public:
     void set_data(int u , int p , int e)
     {
         user = u;
         pass = p;
         exam_number = e;
+    }
+    void set_counter(int d , int t)
+    {
+        d_counter = d;
+        t_counter = t;
+        d_grade = new float [d_counter];
+        student_grade = new float [d_counter];
+        d_answer = new string [d_counter];
+        comment = new string [d_counter];
+        t_grade = new float [t_counter];
+        correctAnswer = new int [t_counter];
+        t_answer = new int [t_counter];
+        WR_answers = new string [t_counter];
+    }
+    void set_Dgrade(int x , float g)
+    {
+        d_grade[x] = g;
+    }
+    void set_Tgrade(int x , float g , int c)
+    {
+        t_grade[x] = g;
+        correctAnswer[x] = c;
+    }
+    void get_answers()
+    {
+        int m = 0;
+        cout<<"descriptive answers:\n";
+        for(int j=0 ; j<d_counter ; j++) {
+            m++;
+            cout<<m<<"_ ";
+            getline(cin >> ws, d_answer[j]);
+        }
+        cout<<"test answers(number of correct option only):\n";
+        m = 0;
+        for(int j=0 ; j<t_counter ; j++)
+        {
+            m++;
+            cout<<m<<"_ ";
+            cin>>t_answer[j];
+        }
+    }
+    void test_correction()
+    {
+        for(int i=0 ; i<t_counter ; i++)
+        {
+            if(t_answer[i] == correctAnswer[i])
+            {
+                total_grade += t_grade[i];
+                WR_answers[i] = "right answer";
+            }
+            else
+                WR_answers[i] = "wrong answer";
+        }
+    }
+    void descriptive_correction()
+    {
+        int z;
+        for(int j=0 ; j<d_counter ; j++)
+        {
+            cout<<j+1<<"_ "<<d_answer[j]<<endl;
+            cout<<"("<<d_grade[j]<<")"<<endl<<"student's grade:\n";
+            cin>>student_grade[j];
+            cout<<"do you want to add comment for this answer? 1_yes  2_no\n";
+            cin>>z;
+            if(z == 1)
+                getline(cin>>ws , comment[j]);
+            else
+                comment[j] = "";
+        }
+        for(int i=0 ; i<d_counter ; i++)
+            total_grade += student_grade[i];
+    }
+    int retExam_number()
+    {
+        return exam_number;
+    }
+    void print()
+    {
+        cout<<"grades for descriptive questions:\n";
+        for(int i=0 ; i<d_counter ; i++)
+        {
+            cout<<i+1<<"_ "<<student_grade[i]<<endl;
+            if(comment[i] != "")
+                cout<<comment[i]<<endl;
+        }
+        cout<<"result of test questions:\n";
+        for(int i=0 ; i<t_counter ; i++)
+            cout<<i+1<<"_ "<<WR_answers[i]<<endl;
+        cout<<"total grade:\n"<<total_grade<<endl;
+    }
+    int ret_user()
+    {
+        return user;
     }
 };
 
@@ -361,7 +463,7 @@ public:
         do {
             cout << "1_change usrename and password\n2_make an exam\n3_show exams\n4_Number of available exams\n";
             cout << "5_make a student list\n6_Number of available lists\n7_show lists\n8_add and remove student from a list\n";
-            cout<<"9_add a student list to an exam\n";
+            cout<<"9_add a student list to an exam\n10_correct exams\n";
             cout << "0_exit\n";
             cin >> n;
             switch (n) {
@@ -451,6 +553,17 @@ public:
                     cin>>e;
                     ex[e - 1].setList_n(l-1);
                     break;
+                case 10:
+                    int t;
+                    cout<<"exam number:\n";
+                    cin>>t;
+                    for(int i=0 ; i<cor_counter ; i++)
+                        if(cor[i].retExam_number() == (t-1))
+                        {
+                            cor[i].descriptive_correction();
+                            cor[i].test_correction();
+                        }
+                    break;
             }
         } while (n != 0) ;
     }
@@ -476,6 +589,23 @@ public:
             cor[cor_counter-1].set_data(a , b , c);
         }
         cor_check = true;
+    }
+    void student_answer2(int c)
+    {
+        float grade;
+        int correct;
+        cor[cor_counter-1].set_counter(ex[c].retD_counter() , ex[c].retT_counter());
+        for(int i=0 ; i<(ex[c].retD_counter()) ; i++)
+        {
+            grade = ex[c].retD_grade(i);
+            cor[cor_counter-1].set_Dgrade(i , grade);
+        }
+        for(int i=0 ; i<(ex[c].retT_counter()) ; i++)
+        {
+            grade = ex[c].retT_grade(i);
+            correct = ex[c].ret_correct(i);
+            cor[cor_counter-1].set_Tgrade(i , grade , correct);
+        }
     }
 };
 //---------------------------------------------------------------------
@@ -524,6 +654,16 @@ public:
                 cout<<"no exam found for you!\n";
             else {
                 student_answer(s_username, s_password, index);
+                student_answer2(index);
+                cor[cor_counter-1].get_answers();
+            }
+        }
+        else
+        {
+            for (int i = 0; i < cor_counter ; ++i) {
+                s_username == cor[i].ret_user();
+                cor[i].print();
+                break;
             }
         }
     }
