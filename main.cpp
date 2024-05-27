@@ -51,23 +51,17 @@ public:
 class exam
 {
 protected:
-    int d_counter = 0 , t_counter = 0 ;
-    int time , type ;
-    string * descriptive ;
-    string *helper_descriptive;
-    float * d_grade ;
-    float *d_grade_helper;
-    string * test;
-    string * helper_test;
-    float * t_grade;
-    float * t_grade_helper;
-    string * options;
-    string * options_helper;
-    int * correctAnswer;
-    int * correctAnswer_helper;
-    int list_n = -1;
-    bool d_check = false;
-    bool t_check = false;
+    int type , time;
+    vector<string>test;
+    string temp;
+    vector<string>options;
+    vector<int>correctAnswer;
+    int i_temp;
+    vector<float>t_grade;
+    float f_temp;
+    vector<string>descriptive;
+    vector<float>d_grade;
+    vector<int>list_number;
 public:
     void questionType()
     {
@@ -79,112 +73,34 @@ public:
         else if(type == 2)
             testQuestion() ;
         else
-            details() ;
+            details();
     }
     void testQuestion() {
-        if (!t_check) {
-            t_counter++;
-            test = new string[t_counter];
             cout << "your question?\n";
-            getline(cin >> ws, test[t_counter - 1]);
-            options = new string [t_counter*4];
+            getline(cin >> ws, temp);
+            test.push_back(temp);
             cout << "enter 4 options (press enter after each one)\n";
-            for(int i=0 ; i<(t_counter*4) ; i++)
-                getline(cin>>ws , options[i]);
-            correctAnswer = new int[t_counter];
-            cout << "which answer is correct ?\n";
-            cin >> correctAnswer[t_counter - 1];
-            t_grade = new float[t_counter];
-            cout << "score for this question:\n";
-            cin >> t_grade[t_counter - 1];
-        }
-        else {
-            helper_test = new string[t_counter];
-            options_helper = new string[t_counter*4];
-            correctAnswer_helper = new int [t_counter];
-            t_grade_helper = new float [t_counter] ;
-            for (int i = 0; i < t_counter; ++i)
-            {
-                helper_test[i] = test[i] ;
-                correctAnswer_helper[i] = correctAnswer[i];
-                t_grade_helper[i] = t_grade[i];
+            for(int i=0 ; i<4 ; i++) {
+                getline(cin >> ws, temp);
+                options.push_back(temp);
             }
-            for(int i = 0; i < (t_counter*4); ++i)
-                options_helper[i] = options[i];
-            delete[]test;
-            delete[]options;
-            delete[]correctAnswer;
-            delete[]t_grade;
-            t_counter++;
-            test = new string[t_counter];
-            options = new string[t_counter*4];
-            correctAnswer = new int[t_counter];
-            t_grade = new float[t_counter];
-            for (int i = 0; i < (t_counter-1); ++i)
-            {
-                test[i] = helper_test[i];
-                correctAnswer[i] = correctAnswer_helper[i];
-                t_grade[i] = t_grade_helper[i];
-            }
-            for (int i = 0; i < ((t_counter*4)-4); ++i)
-                options[i] = options_helper[i];
-            delete[]helper_test;
-            delete[]options_helper;
-            delete[]correctAnswer_helper;
-            delete[]t_grade_helper;
-            cout << "your question?\n";
-            getline(cin >> ws, test[t_counter - 1]);
-            cout << "enter 4 options (press enter after each one)\n";
-            for (int i = ((t_counter*4)-4); i < (t_counter*4); i++)
-                getline(cin >> ws, options[i]);
             cout << "which answer is correct ?\n";
-            cin >> correctAnswer[t_counter - 1];
+            cin >> i_temp;
+            correctAnswer.push_back(i_temp);
             cout << "score for this question:\n";
-            cin >> t_grade[t_counter - 1];
-        }
-        t_check = true;
-        questionType();
+            cin >> f_temp;
+            t_grade.push_back(f_temp);
+            questionType();
     }
     void descriptiveQuestion()
     {
-        if(!d_check)
-        {
-            d_counter++ ;
-            descriptive = new string [d_counter];
             cout<<"your question?\n";
-            getline(cin>>ws , descriptive[d_counter-1]) ;
-            d_grade = new float [d_counter];
+            getline(cin>>ws , temp) ;
+            descriptive.push_back(temp);
             cout<<"score for this question:\n" ;
-            cin>>d_grade[d_counter-1] ;
-        }
-        else
-        {
-            d_grade_helper = new float [d_counter];
-            helper_descriptive = new string [d_counter];
-            for (int i = 0; i < d_counter; ++i)
-            {
-                helper_descriptive [i] = descriptive[i];
-                d_grade_helper[i] = d_grade[i];
-            }
-            delete [] descriptive;
-            delete [] d_grade;
-            ++d_counter;
-            d_grade = new float [d_counter];
-            descriptive = new string [d_counter];
-            for (int i = 0; i < (d_counter-1); ++i)
-            {
-                descriptive[i] = helper_descriptive[i];
-                d_grade [i] = d_grade_helper[i];
-            }
-            delete [] helper_descriptive;
-            delete [] d_grade_helper;
-            cout<<"your question?\n";
-            getline(cin>>ws , descriptive[d_counter-1]) ;
-            cout<<"score for this question:\n" ;
-            cin>>d_grade[d_counter-1] ;
-        }
-        d_check = true;
-        questionType();
+            cin>>f_temp;
+            d_grade.push_back(f_temp);
+            questionType();
     }
     void details()
     {
@@ -196,10 +112,10 @@ public:
         cin>>order ;
         if(order == 1)
         {
-            cout<<t_counter<<" test questions\n"<<d_counter<<" descriptive questions\n" ;
-            for(int j=0 ; j<d_counter ; j++)
+            cout<<test.size()<<" test questions\n"<<descriptive.size()<<" descriptive questions\n" ;
+            for(int j=0 ; j<d_grade.size() ; j++)
                 sum += d_grade[j];
-            for(int j=0 ; j<t_counter ; j++)
+            for(int j=0 ; j<t_grade.size() ; j++)
                 sum += t_grade[j];
             cout<<"total grade: "<<sum<<endl<<"total time: "<<time<<endl ;
         }
@@ -211,11 +127,11 @@ public:
         int counter = 0 , w = 0;
         char abcd[4] = {'A' , 'B' , 'C' , 'D'};
         cout<<"descriptive questions:\n" ;
-        for(int i=0 ; i<d_counter ; i++)
+        for(int i=0 ; i<descriptive.size() ; i++)
             cout<<i+1<<"- "<<descriptive[i]<<"( "<<d_grade[i]<<" )"<<endl;
         cout<<"test questions:\n" ;
-        for(int j=0 ; j<t_counter ; j++) {
-            cout<<(d_counter+j+1)<<"- "<<test[j]<<"( "<<t_grade[j]<<" )"<<endl;
+        for(int j=0 ; j<test.size() ; j++) {
+            cout<<(descriptive.size()+j+1)<<"- "<<test[j]<<"( "<<t_grade[j]<<" )"<<endl;
             for (int i = (counter * 4); i < ((counter * 4) + 4); i++) {
 
                 cout<<abcd[w]<<"_ "<<options[i]<<endl;
@@ -228,19 +144,23 @@ public:
     }
     void setList_n(int y)
     {
-        list_n = y;
+        list_number.push_back(y);
     }
-    int retList_n()
+    int retList_n(int i)
     {
-        return list_n;
+        return list_number[i];
+    }
+    int retListSize()
+    {
+        return list_number.size();
     }
     int retD_counter()
     {
-        return d_counter;
+        return descriptive.size();
     }
     int retT_counter()
     {
-        return t_counter;
+        return test.size();
     }
     float retD_grade(int x)
     {
@@ -253,15 +173,6 @@ public:
     int ret_correct(int x)
     {
         return correctAnswer[x];
-    }
-    ~exam()
-    {
-        delete[]d_grade;
-        delete[]t_grade;
-        delete[]descriptive;
-        delete[]test;
-        delete[]correctAnswer;
-        delete[]options;
     }
 };
 
@@ -281,7 +192,7 @@ class correction
     float * student_grade;
     string * comment;
 public:
-    void set_data(int u , int p , int e)
+    void set_data(int u , int p , int e )
     {
         user = u;
         pass = p;
@@ -380,6 +291,17 @@ public:
     {
         return user;
     }
+    ~correction()
+    {
+        delete[]d_grade;
+        delete[]student_grade;
+        delete[]d_answer;
+        delete[]comment;
+        delete[]t_grade;
+        delete[]correctAnswer;
+        delete[]t_answer;
+        delete[]WR_answers;
+    }
 };
 
 //-------------------------------------------------------------------------------------
@@ -447,7 +369,7 @@ public:
 class professor : public userpass
 {
 protected:
-    int n , new_pass , exam_counter = 0 , list_counter = 0 , cor_counter = 0 , number;
+    int n , new_pass , exam_counter = 0 , list_counter = 0 , number;
     string new_user;
     exam * ex;
     exam * ex_helper;
@@ -455,9 +377,7 @@ protected:
     list * li;
     list * li_helper;
     bool li_check = false;
-    correction * cor;
-    correction * cor_helper;
-    bool cor_check = false;
+    vector<correction>cor;
 public:
     void order() {
         do {
@@ -557,7 +477,7 @@ public:
                     int t;
                     cout<<"exam number:\n";
                     cin>>t;
-                    for(int i=0 ; i<cor_counter ; i++)
+                    for(int i=0 ; i<cor.size() ; i++)
                         if(cor[i].retExam_number() == (t-1))
                         {
                             cor[i].descriptive_correction();
@@ -567,51 +487,32 @@ public:
             }
         } while (n != 0) ;
     }
-    void student_answer(int a , int b , int c)
+    void student_answer(int a , int b , int c )
     {
-        if(!cor_check)
-        {
-            cor_counter++;
-            cor = new correction[cor_counter];
-            cor[cor_counter-1].set_data(a , b , c);
-        }
-        else
-        {
-            cor_helper = new correction[cor_counter];
-            for(int i=0 ; i<cor_counter ; i++)
-                cor_helper[i] = cor[i];
-            delete[]cor;
-            cor_counter++;
-            cor = new correction[cor_counter];
-            for(int j=0 ; j<(cor_counter-1); j++)
-                cor[j] = cor_helper[j];
-            delete[]cor_helper;
-            cor[cor_counter-1].set_data(a , b , c);
-        }
-        cor_check = true;
-    }
-    void student_answer2(int c)
-    {
-        float grade;
-        int correct;
-        cor[cor_counter-1].set_counter(ex[c].retD_counter() , ex[c].retT_counter());
-        for(int i=0 ; i<(ex[c].retD_counter()) ; i++)
-        {
-            grade = ex[c].retD_grade(i);
-            cor[cor_counter-1].set_Dgrade(i , grade);
-        }
-        for(int i=0 ; i<(ex[c].retT_counter()) ; i++)
-        {
-            grade = ex[c].retT_grade(i);
-            correct = ex[c].ret_correct(i);
-            cor[cor_counter-1].set_Tgrade(i , grade , correct);
-        }
+      correction ob;
+      float grade;
+      int correct;
+      ob.set_data(a , b , c);
+      ob.set_counter(ex[c].retD_counter() , ex[c].retT_counter());
+      for(int i=0 ; i<(ex[c].retD_counter()) ; i++)
+      {
+          grade = ex[c].retD_grade(i);
+          ob.set_Dgrade(i , grade);
+      }
+      for(int i=0 ; i<(ex[c].retT_counter()) ; i++)
+      {
+          grade = ex[c].retT_grade(i);
+          correct = ex[c].ret_correct(i);
+          ob.set_Tgrade(i , grade , correct);
+      }
+      cor.push_back(ob);
     }
 };
 //---------------------------------------------------------------------
 class student : public professor
 {
-    int list_number , index;
+    int list_n;
+    vector<int>saveExam;
 public:
     bool s_check()
     {
@@ -623,48 +524,53 @@ public:
             for (int j=0 ; j<size ; j++)
                 if (s_username == li[i].ret_username(j))
                     if (s_password == li[i].ret_password(j)) {
-                        cout << "welcome student " << s_username << endl;
-                        flag = true ;
+                        list_n = i;
+                        flag = true;
                         break;
                     }
-            if(flag) {
-                list_number = i ;
-                break;
-            }
         }
-        if(!flag)
+        if(flag)
+            cout << "welcome student " << s_username << endl;
+        else if(!flag)
             cout<<"wrong information!\n";
         return flag;
     }
     void s_order()
     {
-        int d ;
-        bool find = false;
+        int d;
         cout<<"1_start exam\n2_see score\n";
         cin>>d;
         if(d == 1) {
-            for (int i = 0; i < exam_counter; i++)
-                if (ex[i].retList_n() == list_number) {
-                    ex[i].print_questions();
-                    index = i;
-                    find = true;
-                    break;
+           for(int i=0 ; i<exam_counter ; i++)
+                for(int j=0 ; j<ex[i].retListSize() ; j++)
+                    if(ex[i].retList_n(j) == list_n) {
+                        saveExam.push_back(i);
+                        break;
+                    }
+        if(saveExam.size() == 0)
+            cout<<"no exam found for you!\n";
+        else {
+            int num;
+            cout<<saveExam.size()<<" exams found for you\n";
+            for (int i=0 ; i<saveExam.size() ; i++) {
+                cout << "which exam you want to answer?\n";
+                cin>>num;
+                if(num>0 && num<=saveExam.size())
+                {
+                    ex[saveExam[num-1]].print_questions();
                 }
-            if(!find)
-                cout<<"no exam found for you!\n";
-            else {
-                student_answer(s_username, s_password, index);
-                student_answer2(index);
-                cor[cor_counter-1].get_answers();
+                student_answer(s_username , s_password , saveExam[num-1]);
+                cor[cor.size()-1].get_answers();
             }
+        }
         }
         else
         {
-            for (int i = 0; i < cor_counter ; ++i) {
-                s_username == cor[i].ret_user();
-                cor[i].print();
-                break;
-            }
+            for(int i=0 ; i<cor.size() ; i++)
+                if(s_username == cor[i].ret_user()) {
+                    cout<<"exam "<<cor[i].retExam_number()+1<<" :\n";
+                    cor[i].print();
+                }
         }
     }
 };
