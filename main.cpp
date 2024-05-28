@@ -2,36 +2,37 @@
 #include <string>
 #include<vector>
 #include<algorithm>
+#include <ctime>
 using namespace std ;
 
 class userpass
 {
 protected:
-    string P_username = "ostad402" ;
-    int P_password = 280011642 ;
-    string username ;
-    int password ;
+    string P_username = "ostad402";
+    int P_password = 280011642;
+    string username;
+    int password;
     int s_username , s_password;
 public:
    void set_Puserpass()
     {
         cout<<"enter username:\n";
         cin>>username ;
-        cout<<"enter password:\n" ;
+        cout<<"enter password:\n";
         cin>>password ;
     }
     void set_Suserpass()
     {
         cout<<"enter username:\n";
         cin>>s_username ;
-        cout<<"enter password:\n" ;
+        cout<<"enter password:\n";
         cin>>s_password ;
     }
     bool P_check()
     {
         if((username == P_username) && (password == P_password)) {
             cout << "welcome " << P_username << endl;
-            return true ;
+            return true;
         }
         else {
             cout << "wrong information\n";
@@ -41,8 +42,8 @@ public:
     }
     void change_up(string a , int b)
     {
-        P_username = a ;
-        P_password = b ;
+        P_username = a;
+        P_password = b;
     }
 };
 
@@ -65,13 +66,13 @@ protected:
 public:
     void questionType()
     {
-        cout<<"which type of question you want to enter?\n"<<"1_descriptive  or  2_test "<<"(press 0 if you are done)\n" ;
-        cin>>type ;
+        cout<<"which type of question you want to enter?\n"<<"1_descriptive  or  2_test "<<"(press 0 if you are done)\n";
+        cin>>type;
         if(type == 1) {
             descriptiveQuestion();
         }
         else if(type == 2)
-            testQuestion() ;
+            testQuestion();
         else
             details();
     }
@@ -95,41 +96,41 @@ public:
     void descriptiveQuestion()
     {
             cout<<"your question?\n";
-            getline(cin>>ws , temp) ;
+            getline(cin>>ws , temp);
             descriptive.push_back(temp);
-            cout<<"score for this question:\n" ;
+            cout<<"score for this question:\n";
             cin>>f_temp;
             d_grade.push_back(f_temp);
             questionType();
     }
     void details()
     {
-        int order ;
-        float sum = 0 ;
-        cout<<"time to answer exam:\n" ;
-        cin>>time ;
-        cout<<"press 1 if you want to see the details of exam or press 2 if you want to save the exam and exit\n" ;
-        cin>>order ;
+        int order;
+        float sum = 0;
+        cout<<"time to answer exam:\n";
+        cin>>time;
+        cout<<"press 1 if you want to see the details of exam or press 2 if you want to save the exam and exit\n";
+        cin>>order;
         if(order == 1)
         {
-            cout<<test.size()<<" test questions\n"<<descriptive.size()<<" descriptive questions\n" ;
+            cout<<test.size()<<" test questions\n"<<descriptive.size()<<" descriptive questions\n";
             for(int j=0 ; j<d_grade.size() ; j++)
                 sum += d_grade[j];
             for(int j=0 ; j<t_grade.size() ; j++)
                 sum += t_grade[j];
-            cout<<"total grade: "<<sum<<endl<<"total time: "<<time<<endl ;
+            cout<<"total grade: "<<sum<<endl<<"total time: "<<time<<endl;
         }
         else
-            cout<<"exam saved\n" ;
+            cout<<"exam saved\n";
     }
     void print_questions()
     {
         int counter = 0 , w = 0;
         char abcd[4] = {'A' , 'B' , 'C' , 'D'};
-        cout<<"descriptive questions:\n" ;
+        cout<<"descriptive questions:\n";
         for(int i=0 ; i<descriptive.size() ; i++)
             cout<<i+1<<"- "<<descriptive[i]<<"( "<<d_grade[i]<<" )"<<endl;
-        cout<<"test questions:\n" ;
+        cout<<"test questions:\n";
         for(int j=0 ; j<test.size() ; j++) {
             cout<<(descriptive.size()+j+1)<<"- "<<test[j]<<"( "<<t_grade[j]<<" )"<<endl;
             for (int i = (counter * 4); i < ((counter * 4) + 4); i++) {
@@ -306,16 +307,57 @@ public:
 
 //-------------------------------------------------------------------------------------
 
+struct protest
+{
+    string student_protest , professor_answer;
+    int user , exam_num = 0;
+    time_t now = time(0);
+    char *dt;
+    char *answer_dt;
+    void registrationOfProtest(int n ,int u)
+    {
+        exam_num = n;
+        user = u;
+        cout<<"your pretset?\n";
+        getline(cin>>ws , student_protest);
+        dt = ctime(&now);
+    }
+    void showProtest()
+    {
+        int a;
+        cout<<student_protest<<endl;
+        cout<<"from student: "<<user<<" on exam number: "<<exam_num+1<<endl;
+        cout<<"in date and time: "<<dt<<endl;
+        cout<<"do you want to answer this protest?\n1_yes   2_no\n";
+        cin>>a;
+        if(a == 1) {
+            getline(cin >> ws, professor_answer);
+            answer_dt = ctime(&now);
+        }
+        else if(a == 2)
+            professor_answer = "";
+    }
+    void showAnswer()const
+    {
+        if(professor_answer != "")
+        cout<<"professor answer to your protest: \n"<<professor_answer<<endl<<"in date and time: "<<answer_dt<<endl;
+        else
+            cout<<"no answers yet!\n";
+    }
+};
+
+//-------------------------------------------------------------------------------------
+
 class list
 {
 protected:
     vector<int>s_username;
     vector<int>s_password;
-    int username , password ;
+    int username , password;
 public:
     void make_list()
     {
-        int order = 1 ;
+        int order = 1;
         while (order==1)
         {
             cout << "enter student " << s_username.size() +1 << " username(student ID) and password(national ID number)\n";
@@ -329,7 +371,7 @@ public:
     }
     void remove_student()
     {
-        int temp ;
+        int temp;
         int order = 1;
         while(order==1)
         {
@@ -341,7 +383,7 @@ public:
             else
                 cout << "not found" << endl;
        cout<<"press 1 if you want to continue or press 2 if you are done\n";
-       cin>>order ;
+       cin>>order;
     }
     }
     void print_lists()
@@ -378,12 +420,13 @@ protected:
     list * li_helper;
     bool li_check = false;
     vector<correction>cor;
+    vector<protest>pro;
 public:
     void order() {
         do {
             cout << "1_change usrename and password\n2_make an exam\n3_show exams\n4_Number of available exams\n";
             cout << "5_make a student list\n6_Number of available lists\n7_show lists\n8_add and remove student from a list\n";
-            cout<<"9_add a student list to an exam\n10_correct exams\n";
+            cout<<"9_add a student list to an exam\n10_correct exams\n11_show pretests\n";
             cout << "0_exit\n";
             cin >> n;
             switch (n) {
@@ -484,6 +527,16 @@ public:
                             cor[i].test_correction();
                         }
                     break;
+                case 11:
+                    int s;
+                    cout<<"protest's on exam number:\n";
+                    cin>>s;
+                    for(int i=0 ; i<pro.size() ; i++)
+                    {
+                        if((s-1) == pro[i].exam_num)
+                            pro[i].showProtest();
+                    }
+                    break;
             }
         } while (n != 0) ;
     }
@@ -506,6 +559,12 @@ public:
           ob.set_Tgrade(i , grade , correct);
       }
       cor.push_back(ob);
+    }
+    void student_protest(int n , int u)
+    {
+        protest ob;
+        ob.registrationOfProtest(n , u);
+        pro.push_back(ob);
     }
 };
 //---------------------------------------------------------------------
@@ -538,40 +597,49 @@ public:
     void s_order()
     {
         int d;
-        cout<<"1_start exam\n2_see score\n";
-        cin>>d;
-        if(d == 1) {
-           for(int i=0 ; i<exam_counter ; i++)
-                for(int j=0 ; j<ex[i].retListSize() ; j++)
-                    if(ex[i].retList_n(j) == list_n) {
-                        saveExam.push_back(i);
-                        break;
+        do {
+            cout << "1_start exam\n2_see score\n3_protest on exam\n4_see protest's results\n";
+            cout << "0_exit\n";
+            cin >> d;
+            if (d == 1) {
+                for (int i = 0; i < exam_counter; i++)
+                    for (int j = 0; j < ex[i].retListSize(); j++)
+                        if (ex[i].retList_n(j) == list_n) {
+                            saveExam.push_back(i);
+                            break;
+                        }
+                if (saveExam.size() == 0)
+                    cout << "no exam found for you!\n";
+                else {
+                    int num;
+                    cout << saveExam.size() << " exams found for you\n";
+                    for (int i = 0; i < saveExam.size(); i++) {
+                        cout << "which exam you want to answer?\n";
+                        cin >> num;
+                        if (num > 0 && num <= saveExam.size()) {
+                            ex[saveExam[num - 1]].print_questions();
+                        }
+                        student_answer(s_username, s_password, saveExam[num - 1]);
+                        cor[cor.size() - 1].get_answers();
                     }
-        if(saveExam.size() == 0)
-            cout<<"no exam found for you!\n";
-        else {
-            int num;
-            cout<<saveExam.size()<<" exams found for you\n";
-            for (int i=0 ; i<saveExam.size() ; i++) {
-                cout << "which exam you want to answer?\n";
-                cin>>num;
-                if(num>0 && num<=saveExam.size())
-                {
-                    ex[saveExam[num-1]].print_questions();
                 }
-                student_answer(s_username , s_password , saveExam[num-1]);
-                cor[cor.size()-1].get_answers();
+            } else if (d == 2) {
+                for (int i = 0; i < cor.size(); i++)
+                    if (s_username == cor[i].ret_user()) {
+                        cout << "exam " << cor[i].retExam_number() + 1 << " :\n";
+                        cor[i].print();
+                    }
+            } else if (d == 3) {
+                int b;
+                cout << "which exam you want to protest on?\n";
+                cin >> b;
+                student_protest(saveExam[b - 1], s_username);
+            } else if (d == 4) {
+                for (int j = 0; j < pro.size(); j++)
+                    if (s_username == pro[j].user)
+                        pro[j].showAnswer();
             }
-        }
-        }
-        else
-        {
-            for(int i=0 ; i<cor.size() ; i++)
-                if(s_username == cor[i].ret_user()) {
-                    cout<<"exam "<<cor[i].retExam_number()+1<<" :\n";
-                    cor[i].print();
-                }
-        }
+        } while (d != 0);
     }
 };
 
@@ -580,7 +648,7 @@ public:
 int main()
 {
     student ob;
-    int n ;
+    int n;
     cout << "log in as : 1_professor  or  2_student\n";
     cin >> n;
     while(n == 1 || n == 2)
@@ -597,5 +665,5 @@ int main()
         cout << "log in as : 1_professor  or  2_student\n";
         cin >> n;
     }
-    return 0 ;
+    return 0;
 }
