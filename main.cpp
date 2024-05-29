@@ -194,7 +194,7 @@ class correction
     string * comment;
     bool check = false;
 public:
-    void set_data(int u , int p , int e )
+    void set_data(int u , int p , int e)
     {
         user = u;
         pass = p;
@@ -495,9 +495,20 @@ public:
                     ex_check = true;
                     break;
                 case 3:
-                    cout << "exam number :\n";
-                    cin >> number;
-                    ex[number - 1].print_questions();
+                    cout<<"1_all exams\n2_choose one exam\n";
+                    cin>>number;
+                    if(number == 1)
+                        for(int i=0 ; i<exam_counter ; i++)
+                        {
+                            cout<<"exam number "<<i+1;
+                            ex[i].print_questions();
+                            cout<<"-------------------------------------------"<<endl;
+                        }
+                    else if(number == 2) {
+                        cout << "exam number :\n";
+                        cin >> number;
+                        ex[number - 1].print_questions();
+                    }
                     break;
                 case 4:
                     cout << exam_counter << " exams\n";
@@ -643,13 +654,21 @@ public:
     void student_protest(int n , int u)
     {
         bool found = false;
-        for(int j=0 ; j<pro.size() ; j++) {
-            if (pro[j].user == u && pro[j].exam_num == n)
-                cout << "you have already register your pretest!\n";
-            else
-                found = true;
+        if(pro.size() != 0) {
+            for (int j = 0; j < pro.size(); j++) {
+                if (pro[j].user == u && pro[j].exam_num == n)
+                    cout << "you have already register your pretest!\n";
+                else
+                    found = true;
+            }
+            if (found) {
+                protest ob;
+                ob.registrationOfProtest(n, u);
+                pro.push_back(ob);
+            }
         }
-        if(found) {
+        else
+        {
             protest ob;
             ob.registrationOfProtest(n, u);
             pro.push_back(ob);
@@ -687,16 +706,11 @@ public:
     {
         int d;
         do {
-            cout << "1_start exam\n2_see score\n3_protest on exam\n4_see protest's results\n";
+            cout << "1_start exam\n2_see score\n3_protest on exam\n4_see protest's results\n5_history of exams\n";
             cout << "0_exit\n";
             cin >> d;
             if (d == 1) {
-                for (int i = 0; i < exam_counter; i++)
-                    for (int j = 0; j < ex[i].retListSize(); j++)
-                        if (ex[i].retList_n(j) == list_n) {
-                            saveExam.push_back(i);
-                            break;
-                        }
+                purging();
                 if (saveExam.size() == 0)
                     cout << "no exam found for you!\n";
                 else {
@@ -721,16 +735,71 @@ public:
                         if(cor[i].ret_check())
                             cor[i].print();
             } else if (d == 3) {
+                purging();
+                if (saveExam.size() == 0)
+                    cout << "no exam found for you to protest on!\n";
+                else{
                 int b;
                 cout << "which exam you want to protest on?\n";
                 cin >> b;
-                student_protest(saveExam[b - 1], s_username);
+                student_protest(saveExam[b - 1], s_username);}
             } else if (d == 4) {
                 for (int j = 0; j < pro.size(); j++)
                     if (s_username == pro[j].user)
                         pro[j].showAnswer();
+            } else if(d == 5) {
+                int h;
+                bool flag = false;
+                purging();
+                if(saveExam.size() == 0)
+                    cout<<"no exam found for you!\n";
+                else
+                {
+                    cout<<"1_all exams\n2_choose a exam\n";
+                    cin>>h;
+                    if(h == 1) {
+                        for (int i = 0; i < saveExam.size(); i++)
+                            for (int j = 0; j < cor.size(); j++)
+                                if (saveExam[i] == cor[j].retExam_number() && s_username == cor[j].ret_user())
+                                    if (cor[j].ret_check()) {
+                                        cout << "exam number " << i + 1;
+                                        ex[saveExam[i]].print_questions();
+                                        cor[j].print();
+                                        cout << "-------------------------------------------" << endl;
+                                        flag = true;
+                                        break;
+                                }
+                        if(!flag)
+                            cout<<"no exams in your history!\n";
+                    }
+                    else if(h == 2)
+                    {
+                        cout<<"exam number :\n";
+                        cin>>h;
+                        for(int i=0 ; i<cor.size() ; i++)
+                            if(saveExam[h-1] == cor[i].retExam_number() && s_username == cor[i].ret_user())
+                                if(cor[i].ret_check()) {
+                                    ex[saveExam[h - 1]].print_questions();
+                                    cor[i].print();
+                                    flag = true;
+                                    break;
+                            }
+                        if(!flag)
+                            cout<<"requsted exam not found!\n";
+                    }
+                }
             }
         } while (d != 0);
+    }
+    void purging ()
+    {
+        saveExam.clear();
+        for (int i = 0; i < exam_counter; i++)
+            for (int j = 0; j < ex[i].retListSize(); j++)
+                if (ex[i].retList_n(j) == list_n) {
+                    saveExam.push_back(i);
+                    break;
+                }
     }
 };
 
