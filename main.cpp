@@ -192,6 +192,7 @@ class correction
     string * WR_answers;
     float * student_grade;
     string * comment;
+    bool check = false;
 public:
     void set_data(int u , int p , int e )
     {
@@ -224,19 +225,22 @@ public:
     void get_answers()
     {
         int m = 0;
-        cout<<"descriptive answers:\n";
-        for(int j=0 ; j<d_counter ; j++) {
-            m++;
-            cout<<m<<"_ ";
-            getline(cin >> ws, d_answer[j]);
+        if(d_counter != 0) {
+            cout << "descriptive answers:\n";
+            for (int j = 0; j < d_counter; j++) {
+                m++;
+                cout << m << "_ ";
+                getline(cin >> ws, d_answer[j]);
+            }
         }
-        cout<<"test answers(number of correct option only):\n";
-        m = 0;
-        for(int j=0 ; j<t_counter ; j++)
-        {
-            m++;
-            cout<<m<<"_ ";
-            cin>>t_answer[j];
+        if(t_counter != 0) {
+            cout << "test answers(number of correct option only):\n";
+            m = 0;
+            for (int j = 0; j < t_counter; j++) {
+                m++;
+                cout << m << "_ ";
+                cin >> t_answer[j];
+            }
         }
     }
     void test_correction()
@@ -254,6 +258,7 @@ public:
     }
     void descriptive_correction()
     {
+        check = true;
         int z;
         for(int j=0 ; j<d_counter ; j++)
         {
@@ -274,6 +279,10 @@ public:
     {
         return exam_number;
     }
+    float retTotal()
+    {
+        return total_grade;
+    }
     void print()
     {
         cout<<"grades for descriptive questions:\n";
@@ -291,6 +300,10 @@ public:
     int ret_user()
     {
         return user;
+    }
+    bool ret_check()
+    {
+        return check;
     }
     ~correction()
     {
@@ -314,8 +327,10 @@ struct protest
     time_t now = time(0);
     char *dt;
     char *answer_dt;
+    bool check = false;
     void registrationOfProtest(int n ,int u)
     {
+        check = true;
         exam_num = n;
         user = u;
         cout<<"your pretset?\n";
@@ -402,9 +417,29 @@ public:
     }
     int ret_n()
     {
-        return s_username.size() +1;
+        return s_username.size();
     }
 };
+
+//--------------------------------------------------------------------------------
+
+void sorter(vector<int>user , vector<float>average , int siza)
+{
+    int i_temp , s;
+    s = siza;
+    float f_temp;
+    for(int i=0 ; i<s-1 ; i++)
+        for(int j=0 ; j<s-i-1 ; j++)
+            if(average[j]>average[j+1])
+            {
+                f_temp = average[j];
+                average[j] = average [j+1];
+                average[j+1] = f_temp;
+                i_temp = user[j];
+                user[j] = user[j+1];
+                user[j+1] = i_temp;
+            }
+}
 
 //--------------------------------------------------------------------------------
 
@@ -421,12 +456,15 @@ protected:
     bool li_check = false;
     vector<correction>cor;
     vector<protest>pro;
+    vector<int>user_temp;
+    vector<float>average;
 public:
     void order() {
         do {
             cout << "1_change usrename and password\n2_make an exam\n3_show exams\n4_Number of available exams\n";
             cout << "5_make a student list\n6_Number of available lists\n7_show lists\n8_add and remove student from a list\n";
-            cout<<"9_add a student list to an exam\n10_correct exams\n11_show pretests\n";
+            cout<<"9_add a student list to an exam\n10_correct exams\n11_show pretests\n12_sorting a list based on grades\n";
+            cout<<"13_see a student grades and rank\n";
             cout << "0_exit\n";
             cin >> n;
             switch (n) {
@@ -438,24 +476,21 @@ public:
                     change_up(new_user, new_pass);
                     break;
                 case 2:
-                    if(!ex_check)
-                    {
+                    if (!ex_check) {
                         exam_counter++;
-                        ex = new exam [exam_counter];
-                        ex[exam_counter-1].questionType();
-                    }
-                    else
-                    {
-                        ex_helper = new exam [exam_counter];
-                        for(int i=0 ; i<exam_counter ; i++)
+                        ex = new exam[exam_counter];
+                        ex[exam_counter - 1].questionType();
+                    } else {
+                        ex_helper = new exam[exam_counter];
+                        for (int i = 0; i < exam_counter; i++)
                             ex_helper[i] = ex[i];
                         //delete [] ex; ????
                         exam_counter++;
                         ex = new exam[exam_counter];
-                        for(int j=0 ; j<(exam_counter-1) ; j++)
+                        for (int j = 0; j < (exam_counter - 1); j++)
                             ex[j] = ex_helper[j];
                         //delete[]ex_helper; ????
-                        ex[exam_counter-1].questionType();
+                        ex[exam_counter - 1].questionType();
                     }
                     ex_check = true;
                     break;
@@ -468,24 +503,21 @@ public:
                     cout << exam_counter << " exams\n";
                     break;
                 case 5:
-                    if(!li_check)
-                    {
+                    if (!li_check) {
                         list_counter++;
-                        li = new list [list_counter];
-                        li[list_counter-1].make_list();
-                    }
-                    else
-                    {
-                        li_helper = new list [list_counter];
-                        for(int i=0 ; i<list_counter ; i++)
+                        li = new list[list_counter];
+                        li[list_counter - 1].make_list();
+                    } else {
+                        li_helper = new list[list_counter];
+                        for (int i = 0; i < list_counter; i++)
                             li_helper[i] = li[i];
                         delete[]li;
                         list_counter++;
                         li = new list[list_counter];
-                        for(int j=0 ; j<(list_counter-1) ; j++)
+                        for (int j = 0; j < (list_counter - 1); j++)
                             li[j] = li_helper[j];
                         delete[]li_helper;
-                        li[list_counter-1].make_list();
+                        li[list_counter - 1].make_list();
                     }
                     li_check = true;
                     break;
@@ -509,36 +541,84 @@ public:
                         li[number - 1].remove_student();
                     break;
                 case 9:
-                    int l , e;
-                    cout<<"list number:\n";
-                    cin>>l;
-                    cout<<"to exam number:\n";
-                    cin>>e;
-                    ex[e - 1].setList_n(l-1);
+                    int l, e;
+                    cout << "list number:\n";
+                    cin >> l;
+                    cout << "to exam number:\n";
+                    cin >> e;
+                    ex[e - 1].setList_n(l - 1);
                     break;
                 case 10:
                     int t;
-                    cout<<"exam number:\n";
-                    cin>>t;
-                    for(int i=0 ; i<cor.size() ; i++)
-                        if(cor[i].retExam_number() == (t-1))
-                        {
+                    cout << "exam number:\n";
+                    cin >> t;
+                    for (int i = 0; i < cor.size(); i++)
+                        if (cor[i].retExam_number() == (t - 1)) {
+                            cout<<"student "<<cor[i].ret_user()<<endl<<"exam number "<<cor[i].retExam_number()+1<<endl;
                             cor[i].descriptive_correction();
                             cor[i].test_correction();
+                            cout<<"total grade is: "<<cor[i].retTotal()<<endl;
                         }
                     break;
                 case 11:
                     int s;
-                    cout<<"protest's on exam number:\n";
-                    cin>>s;
-                    for(int i=0 ; i<pro.size() ; i++)
-                    {
-                        if((s-1) == pro[i].exam_num)
+                    cout << "protest's on exam number:\n";
+                    cin >> s;
+                    for (int i = 0; i < pro.size(); i++) {
+                        if ((s - 1) == pro[i].exam_num)
                             pro[i].showProtest();
                     }
                     break;
+                case 12:
+                    int f;
+                    cout << "list number: \n";
+                    cin >> f;
+                    calculate(f);
+                    sorter(user_temp, average, average.size());
+                    cout << "student's grade's from higher to lower:\n";
+                    for (int i = 0; i < average.size(); i++)
+                        cout << user_temp[i] << "        " << average[i];
+                    break;
+                case 13:
+                    int u , counter = 0;
+                    float avg = 0;
+                    cout<<"student username: \n";
+                    cin>>u;
+                    for(int i=0 ; i<cor.size() ; i++)
+                        if(u == cor[i].ret_user())
+                        {
+                            cout<<"exam "<<cor[i].retExam_number()+1<<" : "<<cor[i].retTotal()<<endl;
+                            avg += cor[i].retTotal();
+                            counter++;
+                        }
+                    avg /= counter;
+                    cout<<"average: "<<avg<<endl;
+                    break;
             }
         } while (n != 0) ;
+    }
+    void calculate(int f)
+    {
+        user_temp.clear();
+        average.clear();
+        int temp, counter = 0;
+        float avg = 0;
+        for (int i = 0; i < li[f - 1].ret_n(); i++) {
+            temp = li[f - 1].ret_username(i);
+            user_temp.push_back(temp);
+        }
+        for (int j = 0; j < user_temp.size(); j++) {
+            for (int i = 0; i < cor.size(); i++) {
+                if (user_temp[j] == cor[i].ret_user()) {
+                    avg += cor[i].retTotal();
+                    counter++;
+                }
+            }
+            avg /= counter;
+            average.push_back(avg);
+            counter = 0;
+            avg = 0;
+        }
     }
     void student_answer(int a , int b , int c )
     {
@@ -562,9 +642,18 @@ public:
     }
     void student_protest(int n , int u)
     {
-        protest ob;
-        ob.registrationOfProtest(n , u);
-        pro.push_back(ob);
+        bool found = false;
+        for(int j=0 ; j<pro.size() ; j++) {
+            if (pro[j].user == u && pro[j].exam_num == n)
+                cout << "you have already register your pretest!\n";
+            else
+                found = true;
+        }
+        if(found) {
+            protest ob;
+            ob.registrationOfProtest(n, u);
+            pro.push_back(ob);
+        }
     }
 };
 //---------------------------------------------------------------------
@@ -624,11 +713,13 @@ public:
                     }
                 }
             } else if (d == 2) {
-                for (int i = 0; i < cor.size(); i++)
-                    if (s_username == cor[i].ret_user()) {
-                        cout << "exam " << cor[i].retExam_number() + 1 << " :\n";
-                        cor[i].print();
-                    }
+                int o;
+                cout<<"result of exam number?\n";
+                cin>>o;
+                for(int i=0 ; i<cor.size() ; i++)
+                    if(s_username == cor[i].ret_user() && (o-1) == cor[i].retExam_number())
+                        if(cor[i].ret_check())
+                            cor[i].print();
             } else if (d == 3) {
                 int b;
                 cout << "which exam you want to protest on?\n";
