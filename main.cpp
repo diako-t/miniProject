@@ -63,6 +63,7 @@ protected:
     vector<string>descriptive;
     vector<float>d_grade;
     vector<int>list_number;
+    int share = -1 ;
 public:
     void questionType()
     {
@@ -142,6 +143,17 @@ public:
             w = 0;
         }
         cout<<"time(minute) = "<<time<<endl<<"good luck"<<endl;
+    }
+    void sharing(int s)
+    {
+        if(s == 1)
+            share = 0;
+        else if(s == 2)
+            share = 1;
+    }
+    bool ret_share()
+    {
+        return share;
     }
     void setList_n(int y)
     {
@@ -464,7 +476,7 @@ public:
             cout << "1_change usrename and password\n2_make an exam\n3_show exams\n4_Number of available exams\n";
             cout << "5_make a student list\n6_Number of available lists\n7_show lists\n8_add and remove student from a list\n";
             cout<<"9_add a student list to an exam\n10_correct exams\n11_show pretests\n12_sorting a list based on grades\n";
-            cout<<"13_see a student grades and rank\n";
+            cout<<"13_see a student grades and rank\n14_sharing exam\n";
             cout << "0_exit\n";
             cin >> n;
             switch (n) {
@@ -590,21 +602,37 @@ public:
                     for (int i = 0; i < average.size(); i++)
                         cout << user_temp[i] << "        " << average[i];
                     break;
-                case 13:
-                    int u , counter = 0;
+                case 13: {
+                    int u, counter = 0;
                     float avg = 0;
-                    cout<<"student username: \n";
-                    cin>>u;
-                    for(int i=0 ; i<cor.size() ; i++)
-                        if(u == cor[i].ret_user())
-                        {
-                            cout<<"exam "<<cor[i].retExam_number()+1<<" : "<<cor[i].retTotal()<<endl;
+                    cout << "student username: \n";
+                    cin >> u;
+                    for (int i = 0; i < cor.size(); i++) {
+                        if (u == cor[i].ret_user()) {
+                            cout << "exam " << cor[i].retExam_number() + 1 << " : " << cor[i].retTotal() << endl;
                             avg += cor[i].retTotal();
                             counter++;
                         }
+                    }
                     avg /= counter;
-                    cout<<"average: "<<avg<<endl;
+                    cout << "average: " << avg << endl;
                     break;
+                }
+                case 14:
+                    int q , w;
+                    cout<<"exam number: \n";
+                    cin>>q;
+                    cout<<"1_turn on   2_turn off   3_see all the shared exams\n";
+                    cin>>w;
+                    if(w == 1 || w ==  2)
+                        ex[q-1].sharing(w);
+                    else if(w == 3) {
+                        for (int i = 0; i < exam_counter; i++)
+                            if (ex[q - 1].ret_share() == 0)
+                                cout << "exam number " << i + 1 << endl;
+                    }
+                    else
+                        cout<<"out of range!\n";
             }
         } while (n != 0) ;
     }
@@ -716,15 +744,14 @@ public:
                 else {
                     int num;
                     cout << saveExam.size() << " exams found for you\n";
-                    for (int i = 0; i < saveExam.size(); i++) {
                         cout << "which exam you want to answer?\n";
                         cin >> num;
-                        if (num > 0 && num <= saveExam.size()) {
+                        if (num > 0 && num <= saveExam.size())
+                        {
                             ex[saveExam[num - 1]].print_questions();
                         }
                         student_answer(s_username, s_password, saveExam[num - 1]);
                         cor[cor.size() - 1].get_answers();
-                    }
                 }
             } else if (d == 2) {
                 int o;
@@ -750,7 +777,6 @@ public:
             } else if(d == 5) {
                 int h;
                 bool flag = false;
-                purging();
                 if(saveExam.size() == 0)
                     cout<<"no exam found for you!\n";
                 else
@@ -796,10 +822,22 @@ public:
         saveExam.clear();
         for (int i = 0; i < exam_counter; i++)
             for (int j = 0; j < ex[i].retListSize(); j++)
-                if (ex[i].retList_n(j) == list_n) {
-                    saveExam.push_back(i);
-                    break;
-                }
+                if (ex[i].retList_n(j) == list_n)
+                    if(ex[i].ret_share() == 0) {
+                        saveExam.push_back(i);
+                        break;
+                    }
+    }
+    void purging1 ()
+    {
+        saveExam.clear();
+        for (int i = 0; i < exam_counter; i++)
+            for (int j = 0; j < ex[i].retListSize(); j++)
+                if (ex[i].retList_n(j) == list_n)
+                    if(ex[i].ret_share() == 1) {
+                        saveExam.push_back(i);
+                        break;
+                    }
     }
 };
 
