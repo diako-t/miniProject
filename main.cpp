@@ -3,6 +3,8 @@
 #include<vector>
 #include<algorithm>
 #include <ctime>
+#include <fstream>
+#include <iomanip>
 using namespace std ;
 
 class userpass
@@ -53,7 +55,7 @@ public:
 class exam
 {
 protected:
-    int type , time;
+    int type , time , counter = 0;
     vector<string>test;
     string temp;
     vector<string>options;
@@ -83,6 +85,13 @@ public:
         }
     }
     void testQuestion() {
+            ofstream fileExam("exam.txt", ios::app | ios::out);
+            if(fileExam.fail())
+            {
+                cout<<"file didn't open correctly!\n";
+                exit(-1);
+            }
+            counter++;
             cout << "your question?\n";
             getline(cin >> ws, temp);
             test.push_back(temp);
@@ -97,24 +106,46 @@ public:
             cout << "score for this question:\n";
             cin >> f_temp;
             t_grade.push_back(f_temp);
+            fileExam<<counter<<"_"<<test[test.size()-1]<<"("<<t_grade[t_grade.size()-1]<<")"<<endl;
+            fileExam<<"A_"<<options[options.size()-4]<<setw(5)<<"B_"<<options[options.size()-3]<<endl;
+            fileExam<<"C_"<<options[options.size()-2]<<setw(5)<<"D_"<<options[options.size()-1]<<endl;
+            fileExam.close();
             questionType();
     }
     void descriptiveQuestion()
     {
+            ofstream fileExam("exam.txt", ios::app | ios::out);
+            if(fileExam.fail())
+            {
+                cout<<"file didn't open correctly!\n";
+                exit(-1);
+            }
+            counter++;
             cout<<"your question?\n";
             getline(cin>>ws , temp);
             descriptive.push_back(temp);
             cout<<"score for this question:\n";
             cin>>f_temp;
             d_grade.push_back(f_temp);
+            fileExam<<counter<<"_"<<descriptive[descriptive.size()-1]<<"("<<d_grade[d_grade.size()-1]<<")"<<endl;
+            fileExam.close();
             questionType();
     }
     void details()
     {
+        ofstream fileExam("exam.txt", ios::app | ios::out);
+        if(fileExam.fail())
+        {
+            cout<<"file didn't open correctly!\n";
+            exit(-1);
+        }
         int order;
         float sum = 0;
         cout<<"time to answer exam: ";
         cin>>time;
+        fileExam<<"time to answer exam: "<<time<<"(minute)"<<endl;
+        fileExam<<"----------------------------------------------------"<<endl;
+        fileExam.close();
         cout<<"press 1 if you want to see the details of exam or press 2 if you want to save the exam and exit\n";
         cin>>order;
         if(order == 1)
@@ -256,103 +287,8 @@ public:
         t_grade[x] = g;
         correctAnswer[x] = c;
     }
-    void get_answers()
-    {
-        int m = 0 , hour = 0 , min = 0 , sec = 0;
-        time_t now = time(0);
-        tm *ltm = localtime(&now);
-        cout << "current time " << ltm->tm_hour <<":"<< ltm->tm_min <<":"<< ltm->tm_sec << endl;
-        int additionalhours = ti / 60;
-        int additionalminutes = ti % 60;
-        ltm->tm_min += additionalminutes;
-        if(ltm->tm_min >= 60)
-        {
-            ltm->tm_min -= 60;
-            additionalhours++;
-        }
-        ltm->tm_hour = (ltm->tm_hour + additionalhours) % 24;
-        cout << "exam finished at " << ltm->tm_hour <<":"<< ltm->tm_min <<":"<< ltm->tm_sec << endl;
-        hour = ltm->tm_hour;
-        min = ltm->tm_min;
-        sec = ltm->tm_sec;
-        if(d_counter != 0) {
-            cout << "descriptive answers:\n";
-            for (int j = 0; j < d_counter; j++) {
-                time_t now = time(0);
-                tm *ltm = localtime(&now);
-                if(ltm->tm_hour > hour){
-                    cout << "your time is up" << endl;
-                    return;
-                }
-                else if(ltm->tm_hour < hour)
-                {
-                    cout << "";
-                }
-                else if(ltm->tm_hour == hour) {
-                    if (ltm->tm_min > min) {
-                        cout << "your time is up" << endl;
-                        return;
-                    }
-                    else if(ltm->tm_min < min) {
-                        cout << "";
-                    }
-                    else if (ltm->tm_min == min ) {
+    void get_answers();
 
-                        if(ltm->tm_sec < sec) {
-                            cout << "";
-                        }
-                        else if(ltm->tm_sec >= sec)
-                        {
-                            cout << "your time is up" << endl;
-                            return;
-                        }
-                    }
-                }
-                m++;
-                cout << m << "_ ";
-                getline(cin >> ws, d_answer[j]);
-            }
-        }
-        if(t_counter != 0) {
-            cout << "test answers(number of correct option only):\n";
-            m = 0;
-            for (int j = 0; j < t_counter; j++) {
-                time_t now = time(0);
-                tm *ltm = localtime(&now);
-                if(ltm->tm_hour > hour){
-                    cout << "your time is up" << endl;
-                    return;
-                }
-                else if(ltm->tm_hour < hour)
-                {
-                    cout << "";
-                }
-                else if(ltm->tm_hour == hour) {
-                    if (ltm->tm_min > min) {
-                        cout << "your time is up" << endl;
-                        return;
-                    }
-                    else if(ltm->tm_min < min) {
-                        cout << "";
-                    }
-                    else if (ltm->tm_min == min ) {
-
-                        if(ltm->tm_sec < sec) {
-                            cout << "";
-                        }
-                        else if(ltm->tm_sec >= sec)
-                        {
-                            cout << "your time is up" << endl;
-                            return;
-                        }
-                    }
-                }
-                m++;
-                cout << m << "_ ";
-                cin >> t_answer[j];
-            }
-        }
-    }
     void test_correction()
     {
         for(int i=0 ; i<t_counter ; i++)
@@ -432,6 +368,121 @@ public:
     }
 };
 
+//-----------------------------------------------------------------------
+
+void correction::get_answers()
+{
+    ofstream filecorrection ("correction.txt" , ios::app | ios::out);
+    if(!filecorrection.is_open())
+    {
+        cerr<<"file didn't open correctly!\n";
+        exit(-1);
+    }
+    int m = 0 , hour = 0 , min = 0 , sec = 0;
+    time_t now = time(0);
+    tm *ltm = localtime(&now);
+    cout << "current time " << ltm->tm_hour <<":"<< ltm->tm_min <<":"<< ltm->tm_sec << endl;
+    filecorrection<<"student "<<user<<setw(10)<<"exam number "<<exam_number<<endl;
+    filecorrection<<"current time " << ltm->tm_hour <<":"<< ltm->tm_min <<":"<< ltm->tm_sec << endl;
+    int additionalhours = ti / 60;
+    int additionalminutes = ti % 60;
+    ltm->tm_min += additionalminutes;
+    if(ltm->tm_min >= 60)
+    {
+        ltm->tm_min -= 60;
+        additionalhours++;
+    }
+    ltm->tm_hour = (ltm->tm_hour + additionalhours) % 24;
+    cout << "exam will end at " << ltm->tm_hour <<":"<< ltm->tm_min <<":"<< ltm->tm_sec << endl;
+    filecorrection<< "exam will end at " << ltm->tm_hour <<":"<< ltm->tm_min <<":"<< ltm->tm_sec << endl;
+    hour = ltm->tm_hour;
+    min = ltm->tm_min;
+    sec = ltm->tm_sec;
+    if(d_counter != 0) {
+        cout << "descriptive answers:\n";
+        filecorrection<< "descriptive answers:\n";
+        for (int j = 0; j < d_counter; j++) {
+            time_t now = time(0);
+            tm *ltm = localtime(&now);
+            if(ltm->tm_hour > hour){
+                cout << "your time is up" << endl;
+                return;
+            }
+            else if(ltm->tm_hour < hour)
+            {
+                cout << "";
+            }
+            else if(ltm->tm_hour == hour) {
+                if (ltm->tm_min > min) {
+                    cout << "your time is up" << endl;
+                    return;
+                }
+                else if(ltm->tm_min < min) {
+                    cout << "";
+                }
+                else if (ltm->tm_min == min ) {
+
+                    if(ltm->tm_sec < sec) {
+                        cout << "";
+                    }
+                    else if(ltm->tm_sec >= sec)
+                    {
+                        cout << "your time is up" << endl;
+                        return;
+                    }
+                }
+            }
+            m++;
+            cout << m << "_ ";
+            getline(cin >> ws, d_answer[j]);
+            filecorrection<<m<<"_"<<d_answer[j]<<endl;
+        }
+    }
+    if(t_counter != 0) {
+        cout << "test answers(number of correct option only):\n";
+        filecorrection<<"test answers(number of correct option only):\n";
+        m = 0;
+        for (int j = 0; j < t_counter; j++) {
+            time_t now = time(0);
+            tm *ltm = localtime(&now);
+            if(ltm->tm_hour > hour){
+                cout << "your time is up" << endl;
+                return;
+            }
+            else if(ltm->tm_hour < hour)
+            {
+                cout << "";
+            }
+            else if(ltm->tm_hour == hour) {
+                if (ltm->tm_min > min) {
+                    cout << "your time is up" << endl;
+                    return;
+                }
+                else if(ltm->tm_min < min) {
+                    cout << "";
+                }
+                else if (ltm->tm_min == min ) {
+
+                    if(ltm->tm_sec < sec) {
+                        cout << "";
+                    }
+                    else if(ltm->tm_sec >= sec)
+                    {
+                        cout << "your time is up" << endl;
+                        return;
+                    }
+                }
+            }
+            m++;
+            cout << m << "_ ";
+            cin >> t_answer[j];
+            filecorrection<<m<<"_"<<t_answer[j]<<endl;
+        }
+    }
+    cout<<"------------------------------------------------"<<endl;
+    filecorrection.close();
+}
+
 //-------------------------------------------------------------------------------------
 
 struct protest
@@ -492,6 +543,12 @@ protected:
 public:
     void make_list()
     {
+        ofstream fileList ("list.txt" , ios::app | ios::out);
+        if(fileList.fail())
+        {
+            cerr<<"file didn't open correctly!\n";
+            exit(-1);
+        }
         int order = 1;
         while (order==1)
         {
@@ -499,10 +556,12 @@ public:
             cin >>username>>password;
             s_username.push_back(username);
             s_password.push_back(password);
+            fileList << username <<" "<< password<<endl;
             cout << "press 1 if you want to continue or press 2 if you are done\n";
             cin >> order;
-
         }
+        fileList<<"---------------------------------------------------------"<<endl;
+        fileList.close();
     }
     void remove_student()
     {
@@ -515,6 +574,7 @@ public:
             auto x = find(s_username.begin() , s_username.end() , temp);
             if(x != s_username.end()) {
                 s_username.erase(x);
+                s_password.erase(s_password.begin() + (x - s_username.begin()));
                 cout << "removed seccesfully!\n";
             }
             else
@@ -969,7 +1029,7 @@ public:
                         else if(num == 2)
                         {
                             int h;
-                            cout<<saveExam.size()<<" exams in your history, exam number: ";
+                            cout<<saveExam.size()<<" exams registered in your history, exam number: ";
                             cin>>h;
                             if(h > 0 && h<= saveExam.size()) {
                                 for (int i = 0; i < cor.size(); i++)
@@ -1041,7 +1101,7 @@ int main()
 {
     student ob;
     int n;
-    cout << "log in as : 1_professor  or  2_student\n";
+    cout << "log in as : 1_professor  or  2_student   (press 0 to close the program)\n";
     cin >> n;
     while(n == 1 || n == 2)
     {
@@ -1054,7 +1114,7 @@ int main()
             if (ob.s_check())
                 ob.s_order();
         }
-        cout << "log in as : 1_professor  or  2_student\n";
+        cout << "log in as : 1_professor  or  2_student   (press 0 to close the program)\n";
         cin >> n;
     }
     return 0;
