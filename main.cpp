@@ -200,13 +200,17 @@ public:
     {
         return correctAnswer[x];
     }
+    int ret_time()
+    {
+        return time;
+    }
 };
 
 //-------------------------------------------------------------------------------------
 
 class correction
 {
-    int user , pass , exam_number;
+    int user , pass , exam_number , ti;
     int d_counter , t_counter;
     float total_grade = 0;
     float * d_grade;
@@ -219,11 +223,12 @@ class correction
     string * comment;
     bool check = false;
 public:
-    void set_data(int u , int p , int e)
+    void set_data(int u , int p , int e , int t)
     {
         user = u;
         pass = p;
         exam_number = e;
+        ti = t;
     }
     void set_counter(int d , int t)
     {
@@ -237,6 +242,10 @@ public:
         correctAnswer = new int [t_counter];
         t_answer = new int [t_counter];
         WR_answers = new string [t_counter];
+        for(int i=0 ; i<d_counter ; i++)
+            d_answer[i] = "not answered";
+        for(int j=0 ; j<t_counter ; j++)
+            t_answer[j] = '0';
     }
     void set_Dgrade(int x , float g)
     {
@@ -249,10 +258,56 @@ public:
     }
     void get_answers()
     {
-        int m = 0;
+        int m = 0 , hour = 0 , min = 0 , sec = 0;
+        time_t now = time(0);
+        tm *ltm = localtime(&now);
+        cout << "current time " << ltm->tm_hour <<":"<< ltm->tm_min <<":"<< ltm->tm_sec << endl;
+        int additionalhours = ti / 60;
+        int additionalminutes = ti % 60;
+        ltm->tm_min += additionalminutes;
+        if(ltm->tm_min >= 60)
+        {
+            ltm->tm_min -= 60;
+            additionalhours++;
+        }
+        ltm->tm_hour = (ltm->tm_hour + additionalhours) % 24;
+        cout << "exam finished at " << ltm->tm_hour <<":"<< ltm->tm_min <<":"<< ltm->tm_sec << endl;
+        hour = ltm->tm_hour;
+        min = ltm->tm_min;
+        sec = ltm->tm_sec;
         if(d_counter != 0) {
             cout << "descriptive answers:\n";
             for (int j = 0; j < d_counter; j++) {
+                time_t now = time(0);
+                tm *ltm = localtime(&now);
+                if(ltm->tm_hour > hour){
+                    cout << "your time is up" << endl;
+                    return;
+                }
+                else if(ltm->tm_hour < hour)
+                {
+                    cout << "";
+                }
+                else if(ltm->tm_hour == hour) {
+                    if (ltm->tm_min > min) {
+                        cout << "your time is up" << endl;
+                        return;
+                    }
+                    else if(ltm->tm_min < min) {
+                        cout << "";
+                    }
+                    else if (ltm->tm_min == min ) {
+
+                        if(ltm->tm_sec < sec) {
+                            cout << "";
+                        }
+                        else if(ltm->tm_sec >= sec)
+                        {
+                            cout << "your time is up" << endl;
+                            return;
+                        }
+                    }
+                }
                 m++;
                 cout << m << "_ ";
                 getline(cin >> ws, d_answer[j]);
@@ -262,6 +317,36 @@ public:
             cout << "test answers(number of correct option only):\n";
             m = 0;
             for (int j = 0; j < t_counter; j++) {
+                time_t now = time(0);
+                tm *ltm = localtime(&now);
+                if(ltm->tm_hour > hour){
+                    cout << "your time is up" << endl;
+                    return;
+                }
+                else if(ltm->tm_hour < hour)
+                {
+                    cout << "";
+                }
+                else if(ltm->tm_hour == hour) {
+                    if (ltm->tm_min > min) {
+                        cout << "your time is up" << endl;
+                        return;
+                    }
+                    else if(ltm->tm_min < min) {
+                        cout << "";
+                    }
+                    else if (ltm->tm_min == min ) {
+
+                        if(ltm->tm_sec < sec) {
+                            cout << "";
+                        }
+                        else if(ltm->tm_sec >= sec)
+                        {
+                            cout << "your time is up" << endl;
+                            return;
+                        }
+                    }
+                }
                 m++;
                 cout << m << "_ ";
                 cin >> t_answer[j];
@@ -715,12 +800,12 @@ public:
             avg = 0;
         }
     }
-    void student_answer(int a , int b , int c )
+    void student_answer(int a , int b , int c , int t)
     {
       correction ob;
       float grade;
       int correct;
-      ob.set_data(a , b , c);
+      ob.set_data(a , b , c , t);
       ob.set_counter(ex[c].retD_counter() , ex[c].retT_counter());
       for(int i=0 ; i<(ex[c].retD_counter()) ; i++)
       {
@@ -802,7 +887,7 @@ public:
                                 cout<<"you have already answered this exam!\n";
                             else {
                                 ex[saveExam[num - 1]].print_questions();
-                                student_answer(s_username, s_password, saveExam[num - 1]);
+                                student_answer(s_username, s_password, saveExam[num - 1] , ex[saveExam[num-1]].ret_time());
                                 cor[cor.size() - 1].get_answers();
                             }
                         }
