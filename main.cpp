@@ -16,7 +16,7 @@ protected:
     int password;
     int s_username , s_password;
 public:
-   void get_Puserpass()
+    void get_Puserpass()
     {
         cout<<"enter username:\n";
         cin>>username ;
@@ -85,51 +85,84 @@ public:
         }
     }
     void testQuestion() {
-            ofstream fileExam("exam.txt", ios::app | ios::out);
-            if(fileExam.fail())
-            {
-                cout<<"file didn't open correctly!\n";
-                exit(-1);
-            }
-            counter++;
-            cout << "your question?\n";
+        ofstream fileExam("exam.txt", ios::app | ios::out);
+        if(fileExam.fail())
+        {
+            cout<<"file didn't open correctly!\n";
+            exit(-1);
+        }
+        counter++;
+        cout << "your question?\n";
+        getline(cin >> ws, temp);
+        test.push_back(temp);
+        cout << "enter 4 options (press enter after each one)\n";
+        for(int i=0 ; i<4 ; i++) {
             getline(cin >> ws, temp);
-            test.push_back(temp);
-            cout << "enter 4 options (press enter after each one)\n";
-            for(int i=0 ; i<4 ; i++) {
-                getline(cin >> ws, temp);
-                options.push_back(temp);
-            }
-            cout << "which answer is correct ?\n";
-            cin >> i_temp;
-            correctAnswer.push_back(i_temp);
-            cout << "score for this question:\n";
-            cin >> f_temp;
-            t_grade.push_back(f_temp);
-            fileExam<<counter<<"_"<<test[test.size()-1]<<"("<<t_grade[t_grade.size()-1]<<")"<<endl;
-            fileExam<<"A_"<<options[options.size()-4]<<setw(5)<<"B_"<<options[options.size()-3]<<endl;
-            fileExam<<"C_"<<options[options.size()-2]<<setw(5)<<"D_"<<options[options.size()-1]<<endl;
-            fileExam.close();
-            questionType();
+            options.push_back(temp);
+        }
+        cout << "which answer is correct ?\n";
+        cin >> i_temp;
+        correctAnswer.push_back(i_temp);
+        cout << "score for this question:\n";
+        cin >> f_temp;
+        t_grade.push_back(f_temp);
+        fileExam<<counter<<"_"<<test[test.size()-1]<<"("<<t_grade[t_grade.size()-1]<<")"<<endl;
+        fileExam<<"A_"<<options[options.size()-4]<<setw(5)<<"B_"<<options[options.size()-3]<<endl;
+        fileExam<<"C_"<<options[options.size()-2]<<setw(5)<<"D_"<<options[options.size()-1]<<endl;
+        fileExam.close();
+        questionType();
+    }
+    void readTquestion()
+    {
+        ifstream fileExam("exam.txt");
+        string line1;
+        if(fileExam.is_open()) {
+            while (getline(fileExam, line1));
+            cout << line1 << endl;
+        }
+        else
+        {
+            cerr<<"file didn't open correctly!\n";
+            exit(-1);
+        }
+        fileExam.close();
     }
     void descriptiveQuestion()
     {
-            ofstream fileExam("exam.txt", ios::app | ios::out);
-            if(fileExam.fail())
+        ofstream fileExam("exam.txt", ios::app | ios::out);
+        if(fileExam.fail())
+        {
+            cout<<"file didn't open correctly!\n";
+            exit(-1);
+        }
+        counter++;
+        cout<<"your question?\n";
+        getline(cin>>ws , temp);
+        descriptive.push_back(temp);
+        cout<<"score for this question:\n";
+        cin>>f_temp;
+        d_grade.push_back(f_temp);
+        fileExam<<counter<<"_"<<descriptive[descriptive.size()-1]<<"("<<d_grade[d_grade.size()-1]<<")"<<endl;
+        fileExam.close();
+        questionType();
+    }
+    void readDquestion()
+    {
+        fstream filExam("exam.txt");
+        if(filExam.is_open())
+        {
+            string line2;
+            while(getline(filExam, line2));
             {
-                cout<<"file didn't open correctly!\n";
-                exit(-1);
+                cout << line2 << endl;
             }
-            counter++;
-            cout<<"your question?\n";
-            getline(cin>>ws , temp);
-            descriptive.push_back(temp);
-            cout<<"score for this question:\n";
-            cin>>f_temp;
-            d_grade.push_back(f_temp);
-            fileExam<<counter<<"_"<<descriptive[descriptive.size()-1]<<"("<<d_grade[d_grade.size()-1]<<")"<<endl;
-            fileExam.close();
-            questionType();
+        }
+        else
+        {
+            cerr<<"file didn't open correctly!\n";
+            exit(-1);
+        }
+        filExam.close();
     }
     void details()
     {
@@ -288,7 +321,7 @@ public:
         correctAnswer[x] = c;
     }
     void get_answers();
-
+    void read_answers();
     void test_correction()
     {
         for(int i=0 ; i<t_counter ; i++)
@@ -382,7 +415,7 @@ void correction::get_answers()
     time_t now = time(0);
     tm *ltm = localtime(&now);
     cout << "current time " << ltm->tm_hour <<":"<< ltm->tm_min <<":"<< ltm->tm_sec << endl;
-    filecorrection<<"student "<<user<<setw(10)<<"exam number "<<exam_number<<endl;
+    filecorrection<<"student "<< user <<setw(10)<< " exam number "<<exam_number+1<<endl;
     filecorrection<<"current time " << ltm->tm_hour <<":"<< ltm->tm_min <<":"<< ltm->tm_sec << endl;
     int additionalhours = ti / 60;
     int additionalminutes = ti % 60;
@@ -482,7 +515,22 @@ void correction::get_answers()
     cout<<"------------------------------------------------"<<endl;
     filecorrection.close();
 }
-
+//------------------------------------------------------------------------------------
+void correction::read_answers()
+{
+    ifstream filecorrection("correction.txt", ios::in);
+    if(!filecorrection.is_open())
+    {
+        cerr<<"file didn't open correctly!\n";
+        exit(-1);
+    }
+    string line;
+    while(getline(filecorrection, line))
+    {
+        cout << line << endl;
+    }
+    filecorrection.close();
+}
 //-------------------------------------------------------------------------------------
 
 struct protest
@@ -526,7 +574,7 @@ struct protest
     void showAnswer()const
     {
         if(professor_answer != "")
-        cout<<"professor answer to your protest: \n"<<professor_answer<<endl<<"in date and time: "<<answer_dt<<endl;
+            cout<<"professor answer to your protest: \n"<<professor_answer<<endl<<"in date and time: "<<answer_dt<<endl;
         else
             cout<<"no answers yet!\n";
     }
@@ -563,6 +611,23 @@ public:
         fileList<<"---------------------------------------------------------"<<endl;
         fileList.close();
     }
+    void read_list()
+    {
+        ifstream fileList ("list.txt", ios::in);
+        if(fileList.fail())
+        {
+            cerr<<"file didn't open correctly!\n";
+            exit(-1);
+        }
+        int studentNum = 1;
+        while(!fileList.eof())
+        {
+            cout << "student " << studentNum <<" - username :" << username <<","<<"password :" << password << endl;
+            studentNum++;
+        }
+        fileList.close();
+    }
+
     void remove_student()
     {
         int temp;
@@ -579,9 +644,9 @@ public:
             }
             else
                 cout << "not found" << endl;
-       cout<<"press 1 if you want to continue or press 2 if you are done\n";
-       cin>>order;
-    }
+            cout<<"press 1 if you want to continue or press 2 if you are done\n";
+            cin>>order;
+        }
     }
     void print_lists()const
     {
@@ -749,16 +814,16 @@ public:
                     cout << "exam number: ";
                     cin >> number;
                     if(number > 0 , number <= ex.size()) {
-                            for (int i = 0; i < cor.size(); i++)
-                                if (cor[i].retExam_number() == (number - 1)) {
-                                    cout << "student " << cor[i].ret_user() << endl;
-                                    cor[i].descriptive_correction();
-                                    cor[i].test_correction();
-                                    cout << "total grade is: " << cor[i].retTotal() << endl;
-                                    flag = true;
-                                }
-                            if (!flag)
-                                cout << "No items were found to correct exam number " << number << endl;
+                        for (int i = 0; i < cor.size(); i++)
+                            if (cor[i].retExam_number() == (number - 1)) {
+                                cout << "student " << cor[i].ret_user() << endl;
+                                cor[i].descriptive_correction();
+                                cor[i].test_correction();
+                                cout << "total grade is: " << cor[i].retTotal() << endl;
+                                flag = true;
+                            }
+                        if (!flag)
+                            cout << "No items were found to correct exam number " << number << endl;
                     }
                     else
                         cout << "No exam with this number was found!\n";
@@ -862,23 +927,23 @@ public:
     }
     void student_answer(int a , int b , int c , int t)
     {
-      correction ob;
-      float grade;
-      int correct;
-      ob.set_data(a , b , c , t);
-      ob.set_counter(ex[c].retD_counter() , ex[c].retT_counter());
-      for(int i=0 ; i<(ex[c].retD_counter()) ; i++)
-      {
-          grade = ex[c].retD_grade(i);
-          ob.set_Dgrade(i , grade);
-      }
-      for(int i=0 ; i<(ex[c].retT_counter()) ; i++)
-      {
-          grade = ex[c].retT_grade(i);
-          correct = ex[c].ret_correct(i);
-          ob.set_Tgrade(i , grade , correct);
-      }
-      cor.push_back(ob);
+        correction ob;
+        float grade;
+        int correct;
+        ob.set_data(a , b , c , t);
+        ob.set_counter(ex[c].retD_counter() , ex[c].retT_counter());
+        for(int i=0 ; i<(ex[c].retD_counter()) ; i++)
+        {
+            grade = ex[c].retD_grade(i);
+            ob.set_Dgrade(i , grade);
+        }
+        for(int i=0 ; i<(ex[c].retT_counter()) ; i++)
+        {
+            grade = ex[c].retT_grade(i);
+            correct = ex[c].ret_correct(i);
+            ob.set_Tgrade(i , grade , correct);
+        }
+        cor.push_back(ob);
     }
     void student_protest(int n , int u)
     {
@@ -913,10 +978,10 @@ public:
             size = li[i].ret_n();
             for (int j=0 ; j<size ; j++)
                 if (s_username == li[i].ret_username(j) && s_password == li[i].ret_password(j)){
-                        list_n = i;
-                        flag = true;
-                        break;
-                    }
+                    list_n = i;
+                    flag = true;
+                    break;
+                }
         }
         if(flag)
             cout << "welcome student " << s_username << endl;
@@ -1090,7 +1155,7 @@ public:
                         if (ex[i].ret_share() == 1) {
                             saveExam.push_back(i);
                             break;
-                    }
+                        }
         }
     }
 };
